@@ -40,6 +40,8 @@ export function ProviderLogo({
 
   // Map provider IDs to file names
   const fileMap: Record<string, string> = {
+    copilot: 'github.png',
+    bedrock: 'aws.png',
     nous: 'nous.png',
     'openai-codex': 'openai.png',
     openai: 'openai.png',
@@ -56,6 +58,12 @@ export function ProviderLogo({
 
   const file = fileMap[provider]
   if (!file) {
+    const fallbackLabels: Record<string, string> = {
+      copilot: 'GH',
+      bedrock: 'AWS',
+    }
+    const label = fallbackLabels[provider] || (provider || 'C')[0].toUpperCase()
+    
     return (
       <div
         className={cn(
@@ -64,7 +72,7 @@ export function ProviderLogo({
         )}
         style={{ width: size, height: size }}
       >
-        {(provider || 'C')[0].toUpperCase()}
+        {label}
       </div>
     )
   }

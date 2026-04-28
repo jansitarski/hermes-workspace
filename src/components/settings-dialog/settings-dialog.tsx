@@ -174,6 +174,21 @@ const PROVIDER_CARDS: Array<{
   },
   // Cloud providers
   {
+    id: 'copilot',
+    name: 'GitHub Copilot',
+    logo: '/providers/github.png',
+    models: ['gpt-5.4', 'gpt-5.3', 'gpt-4o', 'o1-pro', 'o1', 'claude-sonnet-4.5'],
+    authType: 'oauth',
+  },
+  {
+    id: 'bedrock',
+    name: 'AWS Bedrock',
+    logo: '/providers/aws.png',
+    models: ['us.anthropic.claude-sonnet-4-6', 'us.anthropic.claude-opus-4-6', 'us.amazon.nova-pro-v1:0', 'us.amazon.nova-lite-v1:0'],
+    authType: 'api_key',
+    envKey: 'AWS_ACCESS_KEY_ID',
+  },
+  {
     id: 'anthropic',
     name: 'Anthropic',
     logo: '/providers/anthropic.png',
