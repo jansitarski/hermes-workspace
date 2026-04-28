@@ -21,28 +21,56 @@ type ModelSwitchResponse = {
 }
 
 function inferProvider(model: string): string {
+  // Handle explicit provider prefix: "copilot:gpt-4o" or "bedrock:us.anthropic.claude"
+  if (model.includes(':')) {
+    const prefix = model.split(':')[0].toLowerCase()
+    if (prefix === 'copilot' || prefix === 'openai' || prefix === 'anthropic') {
+      return 'copilot'
+    }
+    if (prefix === 'bedrock' || prefix === 'aws') {
+      return 'bedrock'
+    }
+  }
+  
+  // Bedrock region-prefixed models
   if (model.startsWith('us.') || model.startsWith('global.')) {
     return 'bedrock'
   }
-  if (model.startsWith('gpt-') || model.startsWith('o1-')) {
+  
+  // OpenAI models
+  if (model.startsWith('gpt-') || model.startsWith('o1-') || model.startsWith('o3-')) {
     return 'copilot'
   }
+  
+  // Claude models
   if (model.includes('claude')) {
-    return model.includes('bedrock') ? 'bedrock' : 'copilot'
+    return model.includes('bedrock') || model.startsWith('us.') ? 'bedrock' : 'copilot'
   }
+  
+  // Other common models
   if (model.includes('gemini')) {
     return 'copilot'
   }
   if (model.includes('nova')) {
     return 'bedrock'
   }
+  
+  // Slash-separated format (e.g., "anthropic/claude", "openai/gpt-4")
   if (model.includes('/')) {
     const prefix = model.split('/')[0]
     if (prefix === 'anthropic' || prefix === 'openai') {
       return 'copilot'
     }
   }
+  
   return 'unknown'
+}
+
+function stripProviderPrefix(model: string): string {
+  if (model.includes(':')) {
+    return model.split(':').slice(1).join(':')
+  }
+  return model
 }
 
 async function switchSessionModel(
@@ -131,23 +159,24 @@ export const Route = createFileRoute('/api/model-switch')({
 
           const trimmedModel = model.trim()
           const provider = inferProvider(trimmedModel)
+          const cleanModel = stripProviderPrefix(trimmedModel)
 
           if (sessionKey && getGatewayCapabilities().sessions) {
-            const sessionResult = await switchSessionModel(sessionKey, trimmedModel)
+            const sessionResult = await switchSessionModel(sessionKey, cleanModel)
             if (sessionResult.ok) {
               return json({
                 ok: true,
-                model: trimmedModel,
+                model: cleanModel,
                 provider,
               })
             }
           }
 
-          const configResult = await updateDefaultModel(trimmedModel, provider)
+          const configResult = await updateDefaultModel(cleanModel, provider)
           if (configResult.ok) {
             return json({
               ok: true,
-              model: trimmedModel,
+              model: cleanModel,
               provider,
             })
           }
