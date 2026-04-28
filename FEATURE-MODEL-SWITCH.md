@@ -95,18 +95,10 @@ providers:
 ## Usage Examples
 
 ### Via Slash Command
-In the chat interface, type:
 ```
-/model gpt-5.4
-/model copilot:gpt-4o
+/model copilot:gpt-5.4
 /model bedrock:us.anthropic.claude-sonnet-4-6
-/model us.amazon.nova-pro-v1:0
 ```
-
-**How it works:**
-- `/model` alone → Opens settings dialog
-- `/model <model-id>` → Switches directly with toast notification
-- Provider prefix is optional (auto-inferred from model ID)
 
 ### Via API
 ```bash
