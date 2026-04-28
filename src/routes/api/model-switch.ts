@@ -6,7 +6,7 @@ import {
   getGatewayCapabilities,
 } from '../../server/hermes-api'
 import { BEARER_TOKEN, HERMES_API } from '../../server/gateway-capabilities'
-import { patchHermesConfig } from '../../server/hermes-dashboard-api'
+import { saveConfig } from '../../server/hermes-dashboard-api'
 
 type ModelSwitchRequest = {
   model: string
@@ -94,7 +94,7 @@ async function updateDefaultModel(
       },
     }
 
-    await patchHermesConfig(configPatch)
+    await saveConfig(configPatch)
     
     return { ok: true }
   } catch (err) {
