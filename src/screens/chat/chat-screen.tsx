@@ -2210,12 +2210,57 @@ export function ChatScreen({
         return true
       }
 
-      if (trimmedCommand === '/model' || trimmedCommand === '/skin') {
+      if (trimmedCommand.startsWith('/model')) {
+        const parts = trimmedCommand.split(/\s+/)
+        
+        if (parts.length === 1) {
+          window.dispatchEvent(
+            new CustomEvent(CHAT_OPEN_SETTINGS_EVENT, {
+              detail: { section: 'hermes' },
+            }),
+          )
+          return true
+        }
+        
+        const modelArg = parts.slice(1).join(' ').trim()
+        if (modelArg.length > 0) {
+          const sessionKey =
+            forcedSessionKey ||
+            resolvedSessionKey ||
+            activeSessionKey ||
+            activeFriendlyId ||
+            'main'
+          
+          fetch('/api/model-switch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              model: modelArg, 
+              sessionKey 
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.ok) {
+                toast(`Switched to ${data.model}`, { type: 'success' })
+                queryClient.invalidateQueries(['models'])
+                queryClient.invalidateQueries(['session-status'])
+              } else {
+                toast(data.error || 'Model switch failed', { type: 'error' })
+              }
+            })
+            .catch((err) => {
+              toast(`Failed to switch model: ${err.message}`, { type: 'error' })
+            })
+          
+          return true
+        }
+      }
+
+      if (trimmedCommand === '/skin') {
         window.dispatchEvent(
           new CustomEvent(CHAT_OPEN_SETTINGS_EVENT, {
-            detail: {
-              section: trimmedCommand === '/skin' ? 'appearance' : 'hermes',
-            },
+            detail: { section: 'appearance' },
           }),
         )
         return true
