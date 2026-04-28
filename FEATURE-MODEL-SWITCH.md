@@ -72,6 +72,11 @@ Create/edit `~/.hermes/models.json`:
 ]
 ```
 
+**Why this is needed:**
+- Models listed here appear in Settings → Model & Provider
+- Models listed here appear in Settings → Smart Routing dropdowns
+- Without this file, only the default model from config.yaml and locally-discovered models (Ollama) will show up
+
 ### Configure Providers
 Edit `~/.hermes/config.yaml`:
 ```yaml
